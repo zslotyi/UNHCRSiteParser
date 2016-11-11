@@ -41,7 +41,14 @@ private final Document parsedDocument;
         Elements elementToReturn = null;
         
         try {
-            elementToReturn = parsedDocument.select(id);
+            if (parsedDocument.select(id)!= null)
+            {
+                elementToReturn = parsedDocument.select(id);
+            }
+            else
+            {
+                
+            }
         }
         catch (Exception ex) {
             Logger.getLogger(UNHCRSiteParser.class.getName()).log(Level.SEVERE, null, ex);
@@ -105,7 +112,10 @@ private final Document parsedDocument;
     private Document parseDocument(String url){
             Document doc = null;
         try {
-            doc = Jsoup.connect(url).get();
+            System.out.println(url);
+            if (url != null)
+            {
+            doc = Jsoup.connect(url).get();}
         } catch (IOException ex) {
             Logger.getLogger(UNHCRSiteParser.class.getName()).log(Level.SEVERE, null, ex);
         }

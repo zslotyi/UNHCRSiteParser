@@ -6,6 +6,14 @@
 package unhcrsiteparser;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -21,6 +29,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -29,6 +38,9 @@ import org.jsoup.select.Elements;
 public class UNHCRSiteParser extends Application {
  
 private ParseSite parsedSite;
+private SitemapReader siteMap;
+private String SiteURL;
+List<String> lines;
     
     private Document parseExample(String url){
             Document doc = null;
@@ -45,7 +57,54 @@ private ParseSite parsedSite;
     @Override
     public void start(Stage primaryStage) {
         
-        parseASite("http://www.unhcr-centraleurope.org/en/news/2015/bureaucracy-threatens-the-dream-of-enterprising-refugees-in-bulgaria.html");
+     lines = new ArrayList<>();
+        
+ 
+    try {
+        siteMap = SitemapReader.getInstance("http://www.unhcr-centraleurope.org/pl/ogolne/sitemap.xml");
+    } catch (SAXException ex) {
+        Logger.getLogger(UNHCRSiteParser.class.getName()).log(Level.SEVERE, null, ex);
+    }
+        
+    
+    
+                while ((SiteURL = siteMap.getNextURL()) != null)
+                {
+                    //SiteURL = siteMap.getNextURL();
+                    parseASite(SiteURL);
+                    WriteASite();
+                        
+                    
+                }
+                WriteToFile();
+                
+    }
+    /**
+     * 
+     */
+    
+    
+    private void WriteToFile () {
+    try {
+        Path file = Paths.get("C:/users/ballaz/the-file-name.txt");
+        Files.write(file, lines, Charset.forName("UTF-8"));
+        //Files.write(file, lines, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
+    } catch (IOException ex) {
+        Logger.getLogger(UNHCRSiteParser.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    }
+    private void WriteASite() {
+        String line = parsedSite.getElementStringValue("title");
+                if (line.length()==0)
+                {
+                    line = "No value for title";
+                }
+        
+        lines.add(line);
+    }
+    
+    private void displayASite(Stage primaryStage) {
+        
         Label title = displayElement("title", "title");
         Label date = displayElement("p.docDateBar", "date");
         Label author = displayElement("div#content p em ", "author");
@@ -58,24 +117,8 @@ private ParseSite parsedSite;
         Label imgsrc = displayImgSRC("div.floatedPhoto img");
         Label metadescription = displayMetaDescription();
         
-        System.out.println(parsedSite.getMetaDescription());
-        
-        /*
-        Elements contentElements = parsedSite.getElement("div#openDoc p");
-        String formattedContent = " ";
-        
-        
-        for (Element paragraph : contentElements) {
-            System.out.println(paragraph.text());
-           paragraph.wrap("<div></div>");
-            System.out.println(paragraph.outerHtml());
-           formattedContent = formattedContent.concat(paragraph.text());
-        }
-        
-        Label formattedContentLabel = new Label(formattedContent);
-        formattedContentLabel.setWrapText(true);
-        */
-        
+              
+       
         
         GridPane root = new GridPane();
         root.add(title,0,0);
@@ -96,7 +139,6 @@ private ParseSite parsedSite;
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
     /**
      * @param args the command line arguments
      */
