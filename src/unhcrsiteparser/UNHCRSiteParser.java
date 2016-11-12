@@ -40,8 +40,11 @@ public class UNHCRSiteParser extends Application {
 private ParseSite parsedSite;
 private SitemapReader siteMap;
 private String SiteURL;
+private UserInterface ui;
 List<String> lines;
-    
+static Thread processingThread;
+static UNHCRSiteParser instance;
+
     private Document parseExample(String url){
             Document doc = null;
         try {
@@ -58,9 +61,74 @@ List<String> lines;
     public void start(Stage primaryStage) {
         
      lines = new ArrayList<>();
-        
- 
+     ui = UserInterface.getInstance(primaryStage, this);
+     instance = this;
+    }
+    
+    /**
+     * API Begins
+     * @param
+     * @return 
+     */
+    static UNHCRSiteParser getUNHCRSiteParserInstance() {
+        return instance;
+    }
+    void WriteToFile () {
     try {
+        Path file = Paths.get("C:/users/ballaz/the-file-name.txt");
+        Files.write(file, lines, Charset.forName("UTF-8"));
+        //Files.write(file, lines, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
+    } catch (IOException ex) {
+        Logger.getLogger(UNHCRSiteParser.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    }
+    void WriteASite() {
+        String line = parsedSite.getElementStringValue("title");
+                if (line.length()==0)
+                {
+                    line = "No value for title";
+                }
+        
+        try {
+            this.lines.add(line);
+            }
+        catch (NullPointerException e) {
+            ui.setFeedBack("Something went wrong with this line: " + line);
+        }
+    }
+    void parseASite (String url) {
+        parsedSite = ParseSite.getInstance(url);
+    }
+    
+    /**
+     * Api Ends
+     * 
+     * @return 
+     */
+    Thread initProcesser(UserInterface ui){
+        Thread t = new Thread(new SiteMapScannerThread(ui));
+        return t;
+    }
+    
+    void StartProcessing(UserInterface ui) {
+        processingThread=this.initProcesser(ui);
+        processingThread.start();
+    }
+    
+    void sfb(String str)
+    {
+        ui.setFeedBack(str);
+    }
+    /**
+     * Don't use the StartProcessing() method - it was only written for testing purposes.
+     * Use the StartProcessing (UserInterface ui); method instead - it will create
+     * a separate thread for reading thourgh the SiteMap
+     */
+    void StartProcessing(){
+        sfb("We're strating off");
+                
+        
+        try {
         siteMap = SitemapReader.getInstance("http://www.unhcr-centraleurope.org/pl/ogolne/sitemap.xml");
     } catch (SAXException ex) {
         Logger.getLogger(UNHCRSiteParser.class.getName()).log(Level.SEVERE, null, ex);
@@ -77,31 +145,13 @@ List<String> lines;
                     
                 }
                 WriteToFile();
-                
-    }
+    } 
     /**
      * 
      */
     
     
-    private void WriteToFile () {
-    try {
-        Path file = Paths.get("C:/users/ballaz/the-file-name.txt");
-        Files.write(file, lines, Charset.forName("UTF-8"));
-        //Files.write(file, lines, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
-    } catch (IOException ex) {
-        Logger.getLogger(UNHCRSiteParser.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    }
-    private void WriteASite() {
-        String line = parsedSite.getElementStringValue("title");
-                if (line.length()==0)
-                {
-                    line = "No value for title";
-                }
-        
-        lines.add(line);
-    }
+    
     
     private void displayASite(Stage primaryStage) {
         
@@ -280,7 +330,5 @@ List<String> lines;
      * method
      * @param url 
      */
-    private void parseASite (String url) {
-        parsedSite = ParseSite.getInstance(url);
-    }
+    
 }
