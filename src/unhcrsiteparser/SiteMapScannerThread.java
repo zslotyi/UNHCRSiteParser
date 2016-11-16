@@ -21,6 +21,7 @@ public class SiteMapScannerThread implements Runnable{
     private SitemapReader siteMap;
     private UNHCRSiteParser unhcrsp;
     private String SiteURL;
+    private ErrorHandler error;
     
     SiteMapScannerThread(UserInterface uiface) {
         ui=uiface;
@@ -31,43 +32,51 @@ public class SiteMapScannerThread implements Runnable{
     @Override
     public void run() {
         unhcrsp = UNHCRSiteParser.getUNHCRSiteParserInstance();
+        error = ErrorHandler.getInstance(ui);
         
-          
+        Platform.runLater(() -> {
+                        error.setError("Example error mesage");
+                        });
+        
         Platform.runLater(() -> {
                         ui.setFeedBack("Work in progress...");
                         });
         ReadSiteMap();
-        while ((SiteURL = siteMap.getNextURL())!= null)
+        int k=0;
+        while (((SiteURL = siteMap.getNextURL())!= null) &&(k++<10))
         {
             Platform.runLater(() -> {
                         ui.setFeedBack(SiteURL);
             });
                         unhcrsp.parseASite(SiteURL);
-                        unhcrsp.WriteASite();
+                        unhcrsp.WriteASite(SiteURL);
+            
+        }   
+            unhcrsp.WriteToFile();
             Platform.runLater(() -> {
                 ui.setFeedBack("Site done!");
             });
-        }                           
         
     }
     private void ReadSiteMap (){
         try {
-        siteMap = SitemapReader.getInstance("http://www.unhcr-centraleurope.org/pl/ogolne/sitemap.xml");
+        siteMap = SitemapReader.getInstance("http://www.unhcr-centraleurope.org/en/general/sitemap.xml");
     } catch (SAXException ex) {
         Logger.getLogger(UNHCRSiteParser.class.getName()).log(Level.SEVERE, null, ex);
     }
     
     }
     
-    private void LoopThroughSiteMap () {
-         while ((SiteURL = siteMap.getNextURL()) != null)
+    private void LoopThroughSiteMap () { int k=0;
+         while (((SiteURL = siteMap.getNextURL()) != null) && (k<10))
                 {
                     System.out.println("asdfélkj");
                     //SiteURL = siteMap.getNextURL();
                     
                     unhcrsp.parseASite(SiteURL);
-                    unhcrsp.WriteASite();
-                        
+                    unhcrsp.WriteASite(SiteURL);
+                    
+                    k++;
                     
                 }
                 unhcrsp.WriteToFile();

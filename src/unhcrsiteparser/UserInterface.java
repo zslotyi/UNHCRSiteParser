@@ -21,16 +21,21 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 
 
 
 public class UserInterface {
     private static UserInterface ui;
-    private Label feedBack;
+    private Label feedBack, error;
     private Button btn;
     private StringProperty feedBackText;
     Task <Void> task ;
+    Label countryCodeLabel;
+    TextField countryCode;
+    Label newsURLLabel;
+    TextField newsURL;
     /**
      * API begins
      * @author Andi
@@ -71,6 +76,19 @@ public class UserInterface {
             thread.setDaemon(true);
             thread.start();
     }
+    /**
+     * This method sets the error message in the Error label
+     * @param str 
+     */
+    void setError(String str){
+        error.setText(str);
+    }
+    String getCountryCode(){
+        return countryCode.getText();
+    }
+    String getNewsURL () {
+        return newsURL.getText();
+    }
 /**
  * API Ends - private methods from here. to interact with the class use the API methods
  * instead
@@ -84,14 +102,29 @@ public class UserInterface {
        btn.setOnAction((ActionEvent event) -> {
            usp.StartProcessing(this);
        });
+       error = new Label();
+       
        feedBack = new Label("feedback");
        feedBackText = new SimpleStringProperty();
        //feedBack.textProperty().bind(feedBackText);
        feedBackText.set("asdf");
        
+       
+       countryCodeLabel = new Label ("Country Code");
+       countryCode = new TextField ();
+       newsURLLabel = new Label ("News folder url");
+       newsURL = new TextField ();
+       
        GridPane root = new GridPane();
        root.add(btn,0,0);
-       root.add(feedBack,0,1);
+       root.add(countryCodeLabel,0,1);
+       root.add(countryCode,1,1);
+       root.add(newsURLLabel,0,2);
+       root.add(newsURL,1,2);
+       
+       
+       root.add(feedBack,0,3);
+       root.add(error,0,4);
        System.out.println("hozzáadtuk");
        
         Scene scene = new Scene(root, 400, 400);

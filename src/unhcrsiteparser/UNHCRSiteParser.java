@@ -44,6 +44,8 @@ private UserInterface ui;
 List<String> lines;
 static Thread processingThread;
 static UNHCRSiteParser instance;
+private ErrorHandler error;
+private int id;
 
     private Document parseExample(String url){
             Document doc = null;
@@ -63,6 +65,8 @@ static UNHCRSiteParser instance;
      lines = new ArrayList<>();
      ui = UserInterface.getInstance(primaryStage, this);
      instance = this;
+     error = ErrorHandler.getInstance(ui);
+     
     }
     
     /**
@@ -82,18 +86,46 @@ static UNHCRSiteParser instance;
         Logger.getLogger(UNHCRSiteParser.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
-    void WriteASite() {
-        String line = parsedSite.getElementStringValue("title");
-                if (line.length()==0)
-                {
-                    line = "No value for title";
-                }
+    void WriteASite(String URL) {
+        /**
+         * We are processing the input of the xml item by item here
+         */
         
-        try {
-            this.lines.add(line);
-            }
-        catch (NullPointerException e) {
-            ui.setFeedBack("Something went wrong with this line: " + line);
+        if (parsedSite.getElementHTMLContent(".error404").length() != 0)
+        {
+            System.out.println("This was a 404 " + URL + parsedSite.getElementHTMLContent("body.error404"));
+        }
+        else
+        {
+                GenerateXML xml = GenerateXML.getInstance();
+
+                xml.setCountryCode(ui.getCountryCode());
+                xml.setDate(displayElement("p.docDateBar", "date"));
+                    xml.setFormattedContent(displayContent());
+                /** This is the format for news items
+                 * xml.setFormattedContent(displayHTMLElement("content","content"));
+                 * This is another format
+                 * xml.setFormattedContent(displayHTMLElement("div.contentText","content"));
+                 */
+                xml.setID("" + id++);
+                xml.setNews(setIfNews(URL));
+                xml.setTitle(parsedSite.getElementStringValue("title"));
+                xml.setURL(URL.replaceAll("http://www.unhcr-centraleurope.org/", ""));
+
+
+                String line = xml.getString();
+
+                        if (line.length()==0)
+                        {
+                            line = "No value for title";
+                        }
+
+                try {
+                    this.lines.add(line);
+                    }
+                catch (NullPointerException e) {
+                    ui.setFeedBack("Something went wrong with this line: " + line);
+                }
         }
     }
     void parseASite (String url) {
@@ -109,7 +141,16 @@ static UNHCRSiteParser instance;
         Thread t = new Thread(new SiteMapScannerThread(ui));
         return t;
     }
-    
+    private String setIfNews(String URL)
+    {
+        if (URL.contains(ui.getNewsURL()))
+                {
+                    return "post";
+                }
+       
+                    return "page";
+  
+    }
     void StartProcessing(UserInterface ui) {
         processingThread=this.initProcesser(ui);
         processingThread.start();
@@ -129,19 +170,20 @@ static UNHCRSiteParser instance;
                 
         
         try {
-        siteMap = SitemapReader.getInstance("http://www.unhcr-centraleurope.org/pl/ogolne/sitemap.xml");
+          siteMap = SitemapReader.getInstance("http://www.unhcr-centraleurope.org/en/general/sitemap.xml");  
+        //siteMap = SitemapReader.getInstance("http://www.unhcr-centraleurope.org/pl/ogolne/sitemap.xml");
     } catch (SAXException ex) {
         Logger.getLogger(UNHCRSiteParser.class.getName()).log(Level.SEVERE, null, ex);
     }
         
     
-    
-                while ((SiteURL = siteMap.getNextURL()) != null)
+    int k = 0;
+                while (((SiteURL = siteMap.getNextURL()) != null) && (k < 11))
                 {
                     //SiteURL = siteMap.getNextURL();
                     parseASite(SiteURL);
-                    WriteASite();
-                        
+                    WriteASite(SiteURL);
+                        k++;
                     
                 }
                 WriteToFile();
@@ -153,7 +195,13 @@ static UNHCRSiteParser instance;
     
     
     
-    private void displayASite(Stage primaryStage) {
+    /**
+     *  This method served testing purposes only. don't uncomment it, as it will
+     * not work!!!!!
+     * 
+     * 
+     * 
+     * private void displayASite(Stage primaryStage) {
         
         Label title = displayElement("title", "title");
         Label date = displayElement("p.docDateBar", "date");
@@ -201,7 +249,7 @@ static UNHCRSiteParser instance;
      * @param id
      * @return Label
      */
-    private Label displayElement(String id, String name) {
+    private String displayElement(String id, String name) {
         //Check if we have an instance of ParseSite
         if (parsedSite == null)
         {
@@ -220,7 +268,7 @@ static UNHCRSiteParser instance;
         
                
         
-        return new Label(labelString);
+        return labelString;
         
     }
     /**
@@ -230,7 +278,30 @@ static UNHCRSiteParser instance;
      * @param name
      * @return 
      */
-    private Label displayHTMLElement (String id, String name) {
+    private String displayContent () {
+          if (parsedSite == null)
+            {
+            throw new AssertionError("We should have a parsedSite set by the time we want to display an element as a label");
+            }
+        
+        String content; 
+            content = parsedSite.getElementHTMLContent("div.content");
+            if (content.length() == 0)
+            {
+                content = parsedSite.getElementHTMLContent("p.doc");
+            }
+            if (content.length() == 0)
+            {
+                content = parsedSite.getElementHTMLContent("div#contentText");
+            }
+            if (content.length() == 0)
+            {
+                content = "Still no content";
+            }
+        
+        return content;
+    }
+    private String displayHTMLElement (String id, String name) {
              //Check if we have an instance of ParseSite
         if (parsedSite == null)
         {
@@ -249,7 +320,7 @@ static UNHCRSiteParser instance;
         
                
         
-        return new Label(labelString);
+        return labelString;
     }
     /**
      * This method will return the src attribute of a picture it is pointed at
@@ -257,7 +328,7 @@ static UNHCRSiteParser instance;
      * @param id
      * @return 
      */
-    private Label displayImgSRC(String id) {
+    private String displayImgSRC(String id) {
          //Check if we have an instance of ParseSite
         if (parsedSite == null)
         {
@@ -270,13 +341,13 @@ static UNHCRSiteParser instance;
                     labelString = "There is no src value for " + id;
                 }
                 
-        return new Label(labelString);        
+        return labelString;        
     }
     /**
      * This method will return a Label with the text of the meta description on it
      * @return 
      */
-    private Label displayMetaDescription(){
+    private String displayMetaDescription(){
        if (parsedSite == null)
         {
             throw new AssertionError("We should have a parsedSite set by the time we want to display an element as a label");
@@ -288,7 +359,7 @@ static UNHCRSiteParser instance;
                     labelString = "There is no src value for meta description";
                 }
                 
-        return new Label(labelString);  
+        return labelString;  
     }
     
     /**
