@@ -60,7 +60,7 @@ public class SiteMapScannerThread implements Runnable{
     }
     private void ReadSiteMap (){
         try {
-        siteMap = SitemapReader.getInstance("http://www.unhcr-centraleurope.org/en/general/sitemap.xml");
+        siteMap = SitemapReader.getInstance(ui.getFeedURL());
     } catch (SAXException ex) {
         Logger.getLogger(UNHCRSiteParser.class.getName()).log(Level.SEVERE, null, ex);
     }

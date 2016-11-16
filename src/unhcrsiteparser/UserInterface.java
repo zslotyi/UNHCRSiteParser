@@ -32,8 +32,8 @@ public class UserInterface {
     private Button btn;
     private StringProperty feedBackText;
     Task <Void> task ;
-    Label countryCodeLabel;
-    TextField countryCode;
+    Label countryCodeLabel, feedURLLabel;
+    TextField countryCode, feedURL;
     Label newsURLLabel;
     TextField newsURL;
     /**
@@ -89,6 +89,9 @@ public class UserInterface {
     String getNewsURL () {
         return newsURL.getText();
     }
+    String getFeedURL(){
+        return feedURL.getText();
+    }
 /**
  * API Ends - private methods from here. to interact with the class use the API methods
  * instead
@@ -98,7 +101,7 @@ public class UserInterface {
      * @param primaryStage 
      */
     private UserInterface (Stage primaryStage, UNHCRSiteParser usp){
-       btn = new Button("Button");
+       btn = new Button("Go!");
        btn.setOnAction((ActionEvent event) -> {
            usp.StartProcessing(this);
        });
@@ -109,27 +112,29 @@ public class UserInterface {
        //feedBack.textProperty().bind(feedBackText);
        feedBackText.set("asdf");
        
-       
+       feedURLLabel = new Label ("Feed URL");
+       feedURL = new TextField ();
        countryCodeLabel = new Label ("Country Code");
        countryCode = new TextField ();
        newsURLLabel = new Label ("News folder url");
        newsURL = new TextField ();
        
        GridPane root = new GridPane();
-       root.add(btn,0,0);
+       root.add(btn,0,3);
+       root.add(feedURLLabel,0,0);
+       root.add(feedURL,1,0);
        root.add(countryCodeLabel,0,1);
        root.add(countryCode,1,1);
        root.add(newsURLLabel,0,2);
        root.add(newsURL,1,2);
        
        
-       root.add(feedBack,0,3);
-       root.add(error,0,4);
-       System.out.println("hozzáadtuk");
+       root.add(feedBack,0,5);
+       root.add(error,0,5);
        
         Scene scene = new Scene(root, 400, 400);
         
-        primaryStage.setTitle("Hello World!");
+        primaryStage.setTitle("UNHCR Website Parser");
         primaryStage.setScene(scene);
         primaryStage.show();
        
