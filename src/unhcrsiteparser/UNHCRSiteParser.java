@@ -11,9 +11,12 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -28,6 +31,7 @@ import javafx.stage.Stage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 import org.xml.sax.SAXException;
 
@@ -46,8 +50,14 @@ static Thread processingThread;
 static UNHCRSiteParser instance;
 private ErrorHandler error;
 private int id;
+private String extraline;
 
-    private Document parseExample(String url){
+/**
+ * This is just for testing purposes - go ahead and ignore this method
+ * @param url
+ * @return 
+ */    
+private Document parseExample(String url){
             Document doc = null;
         try {
             doc = Jsoup.connect(url).get();
@@ -79,12 +89,22 @@ private int id;
     }
     void WriteToFile () {
     try {
-        Path file = Paths.get("C:/users/ballaz/the-file-name.txt");
+        String cC = ui.getCountryCode();
+        Path file = Paths.get("C:/Users/ballaz/Documents/Website/" + cC + ".xml");
         Files.write(file, lines, Charset.forName("UTF-8"));
         //Files.write(file, lines, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
     } catch (IOException ex) {
         Logger.getLogger(UNHCRSiteParser.class.getName()).log(Level.SEVERE, null, ex);
     }
+    }
+    /**
+     * This will generate the first part of the XML file, with version info and general
+     * ite info
+     * TODO: make text fields to generalize this part!!!
+     */
+    void beginTheWholeThing() {
+        GenerateXML xml = GenerateXML.getInstance();
+        this.lines.add(xml.beginTheWholeThing());
     }
     void WriteASite(String URL) {
         /**
@@ -100,7 +120,7 @@ private int id;
                 GenerateXML xml = GenerateXML.getInstance();
 
                 xml.setCountryCode(ui.getCountryCode());
-                xml.setDate(displayElement("p.docDateBar", "date"));
+                xml.setDate(displayDate());
                     xml.setFormattedContent(displayContent());
                 /** This is the format for news items
                  * xml.setFormattedContent(displayHTMLElement("content","content"));
@@ -113,7 +133,7 @@ private int id;
                 xml.setURL(URL.replaceAll("http://www.unhcr-centraleurope.org/", ""));
 
 
-                String line = xml.getString();
+                String line = xml.getString(this.extraline);
 
                         if (line.length()==0)
                         {
@@ -292,14 +312,81 @@ private int id;
             }
             if (content.length() == 0)
             {
+                content = parsedSite.getElementHTMLContent("div#content");
+            }
+            if (content.length() == 0)
+            {
                 content = parsedSite.getElementHTMLContent("div#contentText");
             }
             if (content.length() == 0)
             {
                 content = "Still no content";
             }
+            
+            content = content.replaceAll("_assets/", "http://www.unhcr-centraleurope.org/_assets/");
+            testForImage(content);
+            
+            content = cleanContent(content);
+            content = Jsoup.clean(content, Whitelist.relaxed().preserveRelativeLinks(true));
+            
+            content = content.replaceAll("<div>\\s+<a><img alt=\"\">Print this.*?</div>","");
+            
+            
+            //System.out.println(content);
+            
         
         return content;
+    }
+    /**
+     * This method will format the content to match the new site's criteria, and will
+     * remove unnecessary elements, like breadcrumbs, print this stuff etc.
+     * @param content
+     * @return 
+     */
+    private String cleanContent(String content) {
+        
+        Document d = Jsoup.parse(content);
+        
+        d.select("h1").remove();
+        //content = content.replaceAll(h1, "");
+        
+        d.select("h2").remove();
+        //content = content.replaceAll(h2, "");
+        
+        d.select("div#contentExport").remove();
+        
+        d.select("div#divBreadcrumb").remove();
+        
+        d.select("img.catPhoto").remove();
+        
+        d.select("div.splashCaption").remove();
+        
+       // content = content.replaceAll(printthis, "");
+        
+        return d.outerHtml();
+    }
+    /**
+     * This method will extract the date from a parsed site. If it doesn't have a
+     * date field, it will assign the current date and return as such
+     * @return 
+     */
+    private String displayDate() {
+        if (parsedSite == null)
+            {
+            throw new AssertionError("We should have a parsedSite set by the time we want to display an element as a label");
+            }
+        
+        String date;
+        date = parsedSite.getElementStringValue("p.docDateBar");
+        
+            if (date.length()==0)
+            {
+                SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date now = new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1));
+                date = sdfDate.format(now);
+            }
+        
+        return date;
     }
     private String displayHTMLElement (String id, String name) {
              //Check if we have an instance of ParseSite
@@ -402,4 +489,58 @@ private int id;
      * @param url 
      */
     
+    private void testForImage (String str) {
+        
+        Document d = Jsoup.parse(str);
+        
+        Elements e = d.select(".catPhoto");
+        
+            if ((e != null) && (e.outerHtml().length()!=0)) {
+                System.out.println("van kategóriakép ");
+                      
+                             System.out.println(e.attr("src") + "\n");
+                String url = e.attr("src");
+                String filename = url.replaceAll(".*/", "");
+                String name = filename.replaceAll("\\..*", "");
+                            System.out.println(name + "\n");
+                String title = e.attr("alt");
+                    if (title.length()==0)
+                    {
+                        title = name;
+                    }
+                            System.out.println(title);
+                /**
+                 * We do have a background image, now we do 2 things
+                 * 
+                 * 1., add an <item> to the XML with post type attachment, and the
+                 * details of the image
+                 * 
+                 * 2., create an extra line for the posts <item> xml, that will
+                 * create a _thumbnail_id meta_key with the value of the id of
+                 * the attachment item we have just created.
+                 * 
+                 * These two steps will link up the two items in XML appropriately
+                 */
+                GenerateXML xml = GenerateXML.getInstance();
+                xml.setCountryCode(ui.getCountryCode());
+                xml.setDate(displayDate());
+                xml.setID("" + id);
+                
+                this.lines.add(xml.addBackgroundImageXML(name, filename, url, title));
+                
+                this.extraline = 
+                        "<wp:postmeta>\n" +
+                        "<wp:meta_key><![CDATA[_thumbnail_id]]></wp:meta_key>\n" +
+                        "<wp:meta_value><![CDATA[" + id + "]]></wp:meta_value>\n" +
+                        "</wp:postmeta>";
+                id++;
+                
+            }
+            else
+            {
+                System.out.println("nincs kategóriakép\n");
+                this.extraline = "";
+            }
+        
+    }
 }

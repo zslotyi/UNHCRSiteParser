@@ -43,7 +43,8 @@ public class SiteMapScannerThread implements Runnable{
                         });
         ReadSiteMap();
         int k=0;
-        while (((SiteURL = siteMap.getNextURL())!= null) &&(k++<10))
+        unhcrsp.beginTheWholeThing();
+        while (((SiteURL = siteMap.getNextURL())!= null) &&(k++<40))
         {
             Platform.runLater(() -> {
                         ui.setFeedBack(SiteURL);
@@ -66,9 +67,11 @@ public class SiteMapScannerThread implements Runnable{
     }
     
     }
-    
+    /**
+     * This is not the method we use to loop through the site
+     */
     private void LoopThroughSiteMap () { int k=0;
-         while (((SiteURL = siteMap.getNextURL()) != null) && (k<10))
+         while (((SiteURL = siteMap.getNextURL()) != null) && (k<40))
                 {
                     System.out.println("asdfélkj");
                     //SiteURL = siteMap.getNextURL();

@@ -113,11 +113,11 @@ public class UserInterface {
        feedBackText.set("asdf");
        
        feedURLLabel = new Label ("Feed URL");
-       feedURL = new TextField ();
+       feedURL = new TextField ("http://www.unhcr-centraleurope.org/en/general/sitemap.xml");
        countryCodeLabel = new Label ("Country Code");
-       countryCode = new TextField ();
+       countryCode = new TextField ("en");
        newsURLLabel = new Label ("News folder url");
-       newsURL = new TextField ();
+       newsURL = new TextField ("news");
        
        GridPane root = new GridPane();
        root.add(btn,0,3);
@@ -130,7 +130,7 @@ public class UserInterface {
        
        
        root.add(feedBack,0,5);
-       root.add(error,0,5);
+       root.add(error,0,6);
        
         Scene scene = new Scene(root, 400, 400);
         
