@@ -90,7 +90,7 @@ private Document parseExample(String url){
     void WriteToFile () {
     try {
         String cC = ui.getCountryCode();
-        Path file = Paths.get("C:/Users/ballaz/Documents/Website/" + cC + ".xml");
+        Path file = Paths.get(ui.getPath() + cC + ".xml");
         Files.write(file, lines, Charset.forName("UTF-8"));
         //Files.write(file, lines, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
     } catch (IOException ex) {

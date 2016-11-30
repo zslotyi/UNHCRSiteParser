@@ -22,6 +22,8 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 
 
@@ -32,8 +34,8 @@ public class UserInterface {
     private Button btn;
     private StringProperty feedBackText;
     Task <Void> task ;
-    Label countryCodeLabel, feedURLLabel;
-    TextField countryCode, feedURL;
+    Label countryCodeLabel, feedURLLabel, writeFileLabel;
+    TextField countryCode, feedURL, writeFilePath;
     Label newsURLLabel;
     TextField newsURL;
     /**
@@ -92,6 +94,9 @@ public class UserInterface {
     String getFeedURL(){
         return feedURL.getText();
     }
+    String getPath() {
+        return writeFilePath.getText();
+    }
 /**
  * API Ends - private methods from here. to interact with the class use the API methods
  * instead
@@ -118,26 +123,41 @@ public class UserInterface {
        countryCode = new TextField ("en");
        newsURLLabel = new Label ("News folder url");
        newsURL = new TextField ("news");
+       writeFileLabel = new Label ("Where to write the xml?");
+       writeFilePath = new TextField ("C:/Users/ballaz/Documents/Website/");
+       
+            //Adding image logo
+            Image image = new Image(getClass().getResourceAsStream("unhcr-logo.png"));
+            Label label1 = new Label();
+            label1.setGraphic(new ImageView(image));
+            label1.setStyle("-fx-background-color: #ffffff; -fx-min-width:700px;");
        
        GridPane root = new GridPane();
-       root.add(btn,0,3);
-       root.add(feedURLLabel,0,0);
-       root.add(feedURL,1,0);
-       root.add(countryCodeLabel,0,1);
-       root.add(countryCode,1,1);
-       root.add(newsURLLabel,0,2);
-       root.add(newsURL,1,2);
+       root.setStyle("-fx-background-color: #0072bc;");
+       root.add(btn,0,5);
+       root.add(feedURLLabel,0,1);
+       root.add(feedURL,1,1);
+       root.add(countryCodeLabel,0,3);
+       root.add(countryCode,1,3);
+       root.add(newsURLLabel,0,4);
+       root.add(newsURL,1,4);
+       root.add(label1,0,0,2,1);
+       root.add(writeFileLabel,0,2);
+       root.add(writeFilePath,1,2);
        
+       root.add(feedBack,0,7);
+       root.add(error,0,8);
        
-       root.add(feedBack,0,5);
-       root.add(error,0,6);
-       
-        Scene scene = new Scene(root, 400, 400);
+        Scene scene = new Scene(root, 700, 600);
+        importCSS(scene);
         
         primaryStage.setTitle("UNHCR Website Parser");
         primaryStage.setScene(scene);
         primaryStage.show();
        
     }
-    
+    private void importCSS(Scene scene){
+        String css = this.getClass().getResource("unhcr.css").toExternalForm();
+        scene.getStylesheets().add(css);
+    }
 }
