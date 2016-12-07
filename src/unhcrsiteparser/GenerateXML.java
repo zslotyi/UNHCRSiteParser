@@ -91,7 +91,7 @@ void setNews (String str) {
 "<wp:post_parent>0</wp:post_parent>\n" +
 "<wp:menu_order>0</wp:menu_order>\n" +
 "<wp:post_type>" +
-"<![CDATA[" + news + "]]>" +
+"<![CDATA[post]]>" +
 "</wp:post_type>\n" +
 "<wp:post_password>" +
 "<![CDATA[]]>" +
@@ -158,7 +158,7 @@ String addBackgroundImageXML (String name, String filename, String url, String t
 "		<link>http://www.unhcr.org/" + countryCode + "/" + filename + "</link>\n" +
 "		<pubDate>Tue, 01 Nov 2016 12:11:26 +0000</pubDate>\n" +
 "		<dc:creator><![CDATA[ballaz@unhcr.org]]></dc:creator>\n" +
-"		<guid isPermaLink=\"false\">http://www.unhcr.org/" + countryCode + "/wp-content/uploads/sites/2016/11/" + name + ".jpg</guid>\n" +
+"		<guid isPermaLink=\"false\">http://www.unhcr.org/" + countryCode + "/wp-content/uploads/sites/17/2016/12/" + name + ".jpg</guid>\n" +
 "		<description></description>\n" +
 "		<content:encoded><![CDATA[]]></content:encoded>\n" +
 "		<excerpt:encoded><![CDATA[]]></excerpt:encoded>\n" +
@@ -177,7 +177,7 @@ String addBackgroundImageXML (String name, String filename, String url, String t
 "		<wp:attachment_url><![CDATA[" + url + "]]></wp:attachment_url>\n" +
 "		<wp:postmeta>\n" +
 "			<wp:meta_key><![CDATA[_wp_attached_file]]></wp:meta_key>\n" +
-"			<wp:meta_value><![CDATA[2016/11/" + filename + "]]></wp:meta_value>\n" +
+"			<wp:meta_value><![CDATA[2016/12/" + filename + "]]></wp:meta_value>\n" +
 "		</wp:postmeta>\n" +
 "		<wp:postmeta>\n" +
 "			<wp:meta_key><![CDATA[_wp_attachment_metadata]]></wp:meta_key>\n" +
@@ -187,6 +187,41 @@ String addBackgroundImageXML (String name, String filename, String url, String t
     return str;
 }
 
+String addEmbeddedImageXML (String name, String filename, String url, String title, int post_id) {
+    String str = "<item>\n" +
+"		<title>" + title + "</title>\n" +
+"		<link>http://www.unhcr.org/" + countryCode + "/" + filename + "</link>\n" +
+"		<pubDate>Tue, 25 Oct 2016 11:39:25 +0000</pubDate>\n" +
+"		<dc:creator><![CDATA[ballaz@unhcr.org]]></dc:creator>\n" +
+"		<guid isPermaLink=\"false\">http://www.unhcr.org/" + countryCode + "/wp-content/uploads/sites/2016/11/" + name + ".jpg/guid>\n" +
+"		<description></description>\n" +
+"		<content:encoded><![CDATA[]]></content:encoded>\n" +
+"		<excerpt:encoded><![CDATA[]]></excerpt:encoded>\n" +
+"		<wp:post_id>" + id + "</wp:post_id>\n" +
+"		<wp:post_date><![CDATA[2016-10-25 11:39:25]]></wp:post_date>\n" +
+"		<wp:post_date_gmt><![CDATA[2016-10-25 11:39:25]]></wp:post_date_gmt>\n" +
+"		<wp:comment_status><![CDATA[open]]></wp:comment_status>\n" +
+"		<wp:ping_status><![CDATA[closed]]></wp:ping_status>\n" +
+"		<wp:post_name><![CDATA[" + title + "]]></wp:post_name>\n" +
+"		<wp:status><![CDATA[inherit]]></wp:status>\n" +
+"		<wp:post_parent>" + post_id + "</wp:post_parent>\n" +
+"		<wp:menu_order>0</wp:menu_order>\n" +
+"		<wp:post_type><![CDATA[attachment]]></wp:post_type>\n" +
+"		<wp:post_password><![CDATA[]]></wp:post_password>\n" +
+"		<wp:is_sticky>0</wp:is_sticky>\n" +
+"		<wp:attachment_url><![CDATA[" + url + "]]></wp:attachment_url>\n" +
+"		<wp:postmeta>\n" +
+"			<wp:meta_key><![CDATA[_wp_attached_file]]></wp:meta_key>\n" +
+"			<wp:meta_value><![CDATA[2016/12/" + filename + "]]></wp:meta_value>\n" +
+"		</wp:postmeta>\n" +
+"		<wp:postmeta>\n" +
+"			<wp:meta_key><![CDATA[_wp_attachment_metadata]]></wp:meta_key>\n" +
+"			<wp:meta_value></wp:meta_value>\n" +
+"		</wp:postmeta>\n" +
+"</item>";
+    
+    return str;
+}
     private GenerateXML () {
         
         

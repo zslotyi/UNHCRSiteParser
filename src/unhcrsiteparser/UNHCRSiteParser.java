@@ -49,7 +49,7 @@ List<String> lines;
 static Thread processingThread;
 static UNHCRSiteParser instance;
 private ErrorHandler error;
-private int id;
+private int id=1, post_id;
 private String extraline;
 
 /**
@@ -121,13 +121,15 @@ private Document parseExample(String url){
 
                 xml.setCountryCode(ui.getCountryCode());
                 xml.setDate(displayDate());
-                    xml.setFormattedContent(displayContent());
+                this.post_id = id;
+                xml.setID("" + id++);
+                xml.setFormattedContent(displayContent());
                 /** This is the format for news items
                  * xml.setFormattedContent(displayHTMLElement("content","content"));
                  * This is another format
                  * xml.setFormattedContent(displayHTMLElement("div.contentText","content"));
                  */
-                xml.setID("" + id++);
+                
                 xml.setNews(setIfNews(URL));
                 xml.setTitle(parsedSite.getElementStringValue("title"));
                 xml.setURL(URL.replaceAll("http://www.unhcr-centraleurope.org/", ""));
@@ -163,7 +165,7 @@ private Document parseExample(String url){
     }
     private String setIfNews(String URL)
     {
-        if (URL.contains(ui.getNewsURL()))
+        if (URL.contains("/" + ui.getNewsURL() + "/"))
                 {
                     return "post";
                 }
@@ -324,14 +326,23 @@ private Document parseExample(String url){
             }
             
             content = content.replaceAll("_assets/", "http://www.unhcr-centraleurope.org/_assets/");
-            testForImage(content);
+            testForBackgroundImage(content);
             
             content = cleanContent(content);
             content = Jsoup.clean(content, Whitelist.relaxed().preserveRelativeLinks(true));
             
-            content = content.replaceAll("<div>\\s+<a><img alt=\"\">Print this.*?</div>","");
+            
+            //The following two lines can either remove the "Print this" section of the content 
+            //or everything after this section (incl. the suggested articles part)
+            //comment or uncomment accordingly
+            
+            //content = content.replaceAll("<div>\\s+<a><img alt=\"\">Print this.*?</div>","");
+            content = content.replaceAll("<div>\\s+<a><img alt=\"\">Print this.*","");
             
             
+            
+            
+            content = testForEmbeddedImage(content);
             //System.out.println(content);
             
         
@@ -354,6 +365,9 @@ private Document parseExample(String url){
         //content = content.replaceAll(h2, "");
         
         d.select("div#contentExport").remove();
+        
+        //this will remove all lists from pages below the fold! 
+        d.select("div#pageComponents").remove();
         
         d.select("div#divBreadcrumb").remove();
         
@@ -489,26 +503,37 @@ private Document parseExample(String url){
      * @param url 
      */
     
-    private void testForImage (String str) {
+    /**
+     * This method will test the string passed to it (ideally the content extracted from an xml element
+     * and search for a background image. If it finds one, it does two things:
+     * 
+     * 1., creates an attachment item in the xml
+     * 2., creates an extra line for the post's xml with a meta_key of _thumbnail_id and the
+     * meta value of the id of the attachment item created in the previous step
+     * 
+     */
+        private void testForBackgroundImage (String str) {
         
         Document d = Jsoup.parse(str);
         
+        
+        //first we test the content for background image
         Elements e = d.select(".catPhoto");
         
             if ((e != null) && (e.outerHtml().length()!=0)) {
-                System.out.println("van kategóriakép ");
+               // System.out.println("van kategóriakép ");
                       
-                             System.out.println(e.attr("src") + "\n");
+                           //  System.out.println(e.attr("src") + "\n");
                 String url = e.attr("src");
                 String filename = url.replaceAll(".*/", "");
                 String name = filename.replaceAll("\\..*", "");
-                            System.out.println(name + "\n");
+                            // System.out.println(name + "\n");
                 String title = e.attr("alt");
                     if (title.length()==0)
                     {
                         title = name;
                     }
-                            System.out.println(title);
+                           // System.out.println(title);
                 /**
                  * We do have a background image, now we do 2 things
                  * 
@@ -532,7 +557,7 @@ private Document parseExample(String url){
                         "<wp:postmeta>\n" +
                         "<wp:meta_key><![CDATA[_thumbnail_id]]></wp:meta_key>\n" +
                         "<wp:meta_value><![CDATA[" + id + "]]></wp:meta_value>\n" +
-                        "</wp:postmeta>";
+                        "</wp:postmeta>\n";
                 id++;
                 
             }
@@ -542,5 +567,55 @@ private Document parseExample(String url){
                 this.extraline = "";
             }
         
+    }
+    /**
+     * This method will text the string passed to it (ideally the content of a certain post's xml, that is
+     * cleared from everything already, and check if it has embedded images
+     * 
+     * if it has, it will do two things
+     * 
+     * 1., create a separate xml item for the attachment
+     * 2., append an extra line to the content that will contain the wordpress embed code of embedding the 
+     * image
+     * 
+     * @param content 
+     */
+    
+    private String testForEmbeddedImage (String content) {
+        Document d = Jsoup.parse(content);
+            
+        //first we test the content for an embedded image
+        Elements e = d.select("img");
+        
+        if (e.outerHtml().length() != 0) { //we do have an embedded image
+             System.out.println("van beemelt kép ");
+                      
+                System.out.println(e.attr("src") + "\n");
+                String url = e.attr("src");
+                String filename = url.replaceAll(".*/", "");
+                String name = filename.replaceAll("\\..*", "");
+                            System.out.println(name + "\n");
+                String title = e.attr("alt");
+                    if (title.length()==0)
+                    {
+                        title = name;
+                    }
+                            System.out.println(title);
+                            
+                GenerateXML xml = GenerateXML.getInstance();
+                xml.setCountryCode(ui.getCountryCode());
+                xml.setDate(displayDate());
+                xml.setID("" + id);
+                
+                this.lines.add(xml.addEmbeddedImageXML(name, filename, url, title, this.post_id));
+                
+                
+                d.select("img").before("[caption id=\"attachment_" + id + "\" align=\"alignnone\" width=\"" + e.attr("width") + "\"]");
+                
+                id++;            
+                
+        }
+            
+        return d.outerHtml();
     }
 }

@@ -124,7 +124,7 @@ public class UserInterface {
        newsURLLabel = new Label ("News folder url");
        newsURL = new TextField ("news");
        writeFileLabel = new Label ("Where to write the xml?");
-       writeFilePath = new TextField ("C:/Users/ballaz/Documents/Website/");
+       writeFilePath = new TextField ("C:/Users/user/Documents/UNHCR_parser/");
        
             //Adding image logo
             Image image = new Image(getClass().getResourceAsStream("unhcr-logo.png"));
