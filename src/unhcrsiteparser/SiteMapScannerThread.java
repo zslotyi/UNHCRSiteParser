@@ -44,7 +44,7 @@ public class SiteMapScannerThread implements Runnable{
         ReadSiteMap();
         int k=0;
         unhcrsp.beginTheWholeThing();
-        while (((SiteURL = siteMap.getNextURL())!= null) &&(k++<40))
+        while ((SiteURL = siteMap.getNextURL())!= null)
         {
             Platform.runLater(() -> {
                         ui.setFeedBack(SiteURL);

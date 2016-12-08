@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,8 +50,9 @@ List<String> lines;
 static Thread processingThread;
 static UNHCRSiteParser instance;
 private ErrorHandler error;
-private int id=1, post_id;
-private String extraline;
+private int id=5, post_id;
+private String extraline, photoCaption, photoCredit;
+private List listOfTitles;
 
 /**
  * This is just for testing purposes - go ahead and ignore this method
@@ -76,6 +78,7 @@ private Document parseExample(String url){
      ui = UserInterface.getInstance(primaryStage, this);
      instance = this;
      error = ErrorHandler.getInstance(ui);
+     listOfTitles = new ArrayList<>();
      
     }
     
@@ -104,7 +107,9 @@ private Document parseExample(String url){
      */
     void beginTheWholeThing() {
         GenerateXML xml = GenerateXML.getInstance();
+        xml.setCountryCode(ui.getCountryCode());
         this.lines.add(xml.beginTheWholeThing());
+        this.lines.add(xml.addDefaultBackgroundImages());
     }
     void WriteASite(String URL) {
         /**
@@ -331,7 +336,8 @@ private Document parseExample(String url){
             content = cleanContent(content);
             content = Jsoup.clean(content, Whitelist.relaxed().preserveRelativeLinks(true));
             
-            
+            content = alignImagesToRight(content);
+            //content = appendCaptionAndCreditToImage(content);
             //The following two lines can either remove the "Print this" section of the content 
             //or everything after this section (incl. the suggested articles part)
             //comment or uncomment accordingly
@@ -345,8 +351,40 @@ private Document parseExample(String url){
             content = testForEmbeddedImage(content);
             //System.out.println(content);
             
+            content = content.replaceAll("<br>", "");
         
         return content;
+    }
+    private String alignImagesToRight(String content) {
+        Document d = Jsoup.parse(content);
+        Elements imgs = d.select("img");
+        int i=1;
+            for (Element img : imgs)
+            {
+                if (i==1)
+                {
+                    img.attr("style","float:right");
+                }
+                else
+                {
+                    img.remove();
+                }
+                i++;
+            }
+        //d.select("img").first().attr("style","float:right;");
+        return d.outerHtml();
+    }
+    private String appendCaptionAndCreditToImage(String content){
+        Document d = Jsoup.parse(content);
+        d.select("img").before("<div class=\"wp-caption\" style=\"float:right;\"");
+        String captionCredit = this.photoCaption + this.photoCredit;
+        
+            Document c = Jsoup.parse(captionCredit);
+            c.select("div.photoCaption").before("<div class=\"wp-caption-wrapper\"><p class=\"wp-caption-text\">");
+            c.select("div.photoCaption").after(c.select("div.photoCredit").text() + "</p></div>");
+        
+        d.select("img").after(c.outerHtml() );
+        return d.outerHtml();
     }
     /**
      * This method will format the content to match the new site's criteria, and will
@@ -375,6 +413,17 @@ private Document parseExample(String url){
         
         d.select("div.splashCaption").remove();
         
+        d.select("div#docViewBar").remove();
+        
+        d.select("div.photoCaption").attr("style","float:right;");
+        d.select("div.photoCredit").attr("style","float:right;");
+        
+        this.photoCaption = d.select("div.photoCaption").outerHtml();
+        this.photoCredit = d.select("div.photoCredit").outerHtml();
+        
+        d.select("div.photoCaption").remove();
+        d.select("div.photoCredit").remove();
+        
        // content = content.replaceAll(printthis, "");
         
         return d.outerHtml();
@@ -390,16 +439,21 @@ private Document parseExample(String url){
             throw new AssertionError("We should have a parsedSite set by the time we want to display an element as a label");
             }
         
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date now = new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1));
+        String date = sdfDate.format(now);
+        
+        /*
         String date;
         date = parsedSite.getElementStringValue("p.docDateBar");
         
             if (date.length()==0)
             {
-                SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                
                 Date now = new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1));
                 date = sdfDate.format(now);
             }
-        
+        */
         return date;
     }
     private String displayHTMLElement (String id, String name) {
@@ -529,6 +583,9 @@ private Document parseExample(String url){
                 String name = filename.replaceAll("\\..*", "");
                             // System.out.println(name + "\n");
                 String title = e.attr("alt");
+                
+                    title = checkForTitleDuplicate(title);
+                
                     if (title.length()==0)
                     {
                         title = name;
@@ -563,10 +620,45 @@ private Document parseExample(String url){
             }
             else
             {
+                //If we don't have a background image set, we select one of the
+                //default background images by random
+                
                 System.out.println("nincs kategóriakép\n");
-                this.extraline = "";
+                Random r = new Random();
+                int Low = 1;
+                int High = 4;
+                int Result = r.nextInt(High-Low) + Low;
+                this.extraline = "<wp:postmeta>\n" +
+                        "<wp:meta_key><![CDATA[_thumbnail_id]]></wp:meta_key>\n" +
+                        "<wp:meta_value><![CDATA[" + Result + "]]></wp:meta_value>\n" +
+                        "</wp:postmeta>\n";
             }
         
+    }
+    /**
+     * This method will check the String value passed to it in the listOfTitles() ArrayList,
+     * if it's in there, it will add a modificator. When we made sure that the title is unique,
+     * we put the unique title in the ArrayList and return the new (unique) title.
+     * 
+     * If the title was unique in the first place, it will be returned unchanged.
+     * 
+     * @param str
+     * @return 
+     */
+    private String checkForTitleDuplicate(String str) {
+        
+        while (listOfTitles.contains(str))
+        {
+            Random r = new Random();
+            int Low = 1;
+            int High = 4000;
+            int Result = r.nextInt(High-Low) + Low;
+            
+                str = str + Result;
+            
+        }
+        listOfTitles.add(str);
+        return str;
     }
     /**
      * This method will text the string passed to it (ideally the content of a certain post's xml, that is
@@ -580,8 +672,7 @@ private Document parseExample(String url){
      * 
      * @param content 
      */
-    
-    private String testForEmbeddedImage (String content) {
+     private String testForEmbeddedImage (String content) {
         Document d = Jsoup.parse(content);
             
         //first we test the content for an embedded image
@@ -596,6 +687,9 @@ private Document parseExample(String url){
                 String name = filename.replaceAll("\\..*", "");
                             System.out.println(name + "\n");
                 String title = e.attr("alt");
+                
+                title = checkForTitleDuplicate(title);
+                
                     if (title.length()==0)
                     {
                         title = name;
@@ -610,7 +704,7 @@ private Document parseExample(String url){
                 this.lines.add(xml.addEmbeddedImageXML(name, filename, url, title, this.post_id));
                 
                 
-                d.select("img").before("[caption id=\"attachment_" + id + "\" align=\"alignnone\" width=\"" + e.attr("width") + "\"]");
+                d.select("img").before("[caption id=\"attachment_" + id + "\" align=\"right\" width=\"" + e.attr("width") + "\"]");
                 
                 id++;            
                 

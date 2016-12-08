@@ -152,6 +152,132 @@ String beginTheWholeThing() {
 return str;
 }
 
+String addDefaultBackgroundImages () {
+ String str = "<item>\n" +
+"		<title>Default Background1</title>\n" +
+"		<link>http://www.unhcr.org/ceu/default_background_1</link>\n" +
+"		<pubDate>Tue, 01 Nov 2016 12:11:26 +0000</pubDate>\n" +
+"		<dc:creator><![CDATA[ballaz@unhcr.org]]></dc:creator>\n" +
+"		<guid isPermaLink=\"false\">http://www.unhcr.org/ceu/wp-content/uploads/sites/17/2016/12/default_background_1.jpg</guid>\n" +
+"		<description></description>\n" +
+"		<content:encoded><![CDATA[]]></content:encoded>\n" +
+"		<excerpt:encoded><![CDATA[]]></excerpt:encoded>\n" +
+"		<wp:post_id>" + "1" + "</wp:post_id>\n" +
+"		<wp:post_date><![CDATA[2016-11-01 12:11:26]]></wp:post_date>\n" +
+"		<wp:post_date_gmt><![CDATA[2016-11-01 12:11:26]]></wp:post_date_gmt>\n" +
+"		<wp:comment_status><![CDATA[closed]]></wp:comment_status>\n" +
+"		<wp:ping_status><![CDATA[closed]]></wp:ping_status>\n" +
+"		<wp:post_name><![CDATA[" + "default_background_1" + "]]></wp:post_name>\n" +
+"		<wp:status><![CDATA[inherit]]></wp:status>\n" +
+"		<wp:post_parent>0</wp:post_parent>\n" +
+"		<wp:menu_order>0</wp:menu_order>\n" +
+"		<wp:post_type><![CDATA[attachment]]></wp:post_type>\n" +
+"		<wp:post_password><![CDATA[]]></wp:post_password>\n" +
+"		<wp:is_sticky>0</wp:is_sticky>\n" +
+"		<wp:attachment_url><![CDATA[" + "http://www.unhcr.org/ceu/wp-content/uploads/sites/17/2016/12/default_background_1.jpg]]></wp:attachment_url>\n" +
+"		<wp:postmeta>\n" +
+"			<wp:meta_key><![CDATA[_wp_attached_file]]></wp:meta_key>\n" +
+"			<wp:meta_value><![CDATA[2016/12/" + "default_background_1.jpg" + "]]></wp:meta_value>\n" +
+"		</wp:postmeta>\n" +
+"		<wp:postmeta>\n" +
+"			<wp:meta_key><![CDATA[_wp_attachment_metadata]]></wp:meta_key>\n" +
+"			<wp:meta_value></wp:meta_value>\n" +
+"		</wp:postmeta>\n" +
+"</item>\n" +
+"<item>\n" +
+"		<title>Default Background2</title>\n" +
+"		<link>http://www.unhcr.org/ceu/default_background_2</link>\n" +
+"		<pubDate>Tue, 01 Nov 2016 12:11:26 +0000</pubDate>\n" +
+"		<dc:creator><![CDATA[ballaz@unhcr.org]]></dc:creator>\n" +
+"		<guid isPermaLink=\"false\">http://www.unhcr.org/ceu/wp-content/uploads/sites/17/2016/12/default_background_2.jpg</guid>\n" +
+"		<description></description>\n" +
+"		<content:encoded><![CDATA[]]></content:encoded>\n" +
+"		<excerpt:encoded><![CDATA[]]></excerpt:encoded>\n" +
+"		<wp:post_id>" + "2" + "</wp:post_id>\n" +
+"		<wp:post_date><![CDATA[2016-11-01 12:11:26]]></wp:post_date>\n" +
+"		<wp:post_date_gmt><![CDATA[2016-11-01 12:11:26]]></wp:post_date_gmt>\n" +
+"		<wp:comment_status><![CDATA[closed]]></wp:comment_status>\n" +
+"		<wp:ping_status><![CDATA[closed]]></wp:ping_status>\n" +
+"		<wp:post_name><![CDATA[" + "default_background_2" + "]]></wp:post_name>\n" +
+"		<wp:status><![CDATA[inherit]]></wp:status>\n" +
+"		<wp:post_parent>0</wp:post_parent>\n" +
+"		<wp:menu_order>0</wp:menu_order>\n" +
+"		<wp:post_type><![CDATA[attachment]]></wp:post_type>\n" +
+"		<wp:post_password><![CDATA[]]></wp:post_password>\n" +
+"		<wp:is_sticky>0</wp:is_sticky>\n" +
+"		<wp:attachment_url><![CDATA[" + "http://www.unhcr.org/ceu/wp-content/uploads/sites/17/2016/12/default_background_2.jpg]]></wp:attachment_url>\n" +
+"		<wp:postmeta>\n" +
+"			<wp:meta_key><![CDATA[_wp_attached_file]]></wp:meta_key>\n" +
+"			<wp:meta_value><![CDATA[2016/12/" + "default_background_2.jpg" + "]]></wp:meta_value>\n" +
+"		</wp:postmeta>\n" +
+"		<wp:postmeta>\n" +
+"			<wp:meta_key><![CDATA[_wp_attachment_metadata]]></wp:meta_key>\n" +
+"			<wp:meta_value></wp:meta_value>\n" +
+"		</wp:postmeta>\n" +
+"</item>\n" +"<item>\n" +
+"		<title>Default Background3</title>\n" +
+"		<link>http://www.unhcr.org/ceu/default_background_3</link>\n" +
+"		<pubDate>Tue, 01 Nov 2016 12:11:26 +0000</pubDate>\n" +
+"		<dc:creator><![CDATA[ballaz@unhcr.org]]></dc:creator>\n" +
+"		<guid isPermaLink=\"false\">http://www.unhcr.org/ceu/wp-content/uploads/sites/17/2016/12/default_background_3.jpg</guid>\n" +
+"		<description></description>\n" +
+"		<content:encoded><![CDATA[]]></content:encoded>\n" +
+"		<excerpt:encoded><![CDATA[]]></excerpt:encoded>\n" +
+"		<wp:post_id>" + "3" + "</wp:post_id>\n" +
+"		<wp:post_date><![CDATA[2016-11-01 12:11:26]]></wp:post_date>\n" +
+"		<wp:post_date_gmt><![CDATA[2016-11-01 12:11:26]]></wp:post_date_gmt>\n" +
+"		<wp:comment_status><![CDATA[closed]]></wp:comment_status>\n" +
+"		<wp:ping_status><![CDATA[closed]]></wp:ping_status>\n" +
+"		<wp:post_name><![CDATA[" + "default_background_3" + "]]></wp:post_name>\n" +
+"		<wp:status><![CDATA[inherit]]></wp:status>\n" +
+"		<wp:post_parent>0</wp:post_parent>\n" +
+"		<wp:menu_order>0</wp:menu_order>\n" +
+"		<wp:post_type><![CDATA[attachment]]></wp:post_type>\n" +
+"		<wp:post_password><![CDATA[]]></wp:post_password>\n" +
+"		<wp:is_sticky>0</wp:is_sticky>\n" +
+"		<wp:attachment_url><![CDATA[" + "http://www.unhcr.org/ceu/wp-content/uploads/sites/17/2016/12/default_background_3.jpg]]></wp:attachment_url>\n" +
+"		<wp:postmeta>\n" +
+"			<wp:meta_key><![CDATA[_wp_attached_file]]></wp:meta_key>\n" +
+"			<wp:meta_value><![CDATA[2016/12/" + "default_background_3.jpg" + "]]></wp:meta_value>\n" +
+"		</wp:postmeta>\n" +
+"		<wp:postmeta>\n" +
+"			<wp:meta_key><![CDATA[_wp_attachment_metadata]]></wp:meta_key>\n" +
+"			<wp:meta_value></wp:meta_value>\n" +
+"		</wp:postmeta>\n" +
+"</item>\n" +"<item>\n" +
+"		<title>Default Background4</title>\n" +
+"		<link>http://www.unhcr.org/ceu/default_background_4</link>\n" +
+"		<pubDate>Tue, 01 Nov 2016 12:11:26 +0000</pubDate>\n" +
+"		<dc:creator><![CDATA[ballaz@unhcr.org]]></dc:creator>\n" +
+"		<guid isPermaLink=\"false\">http://www.unhcr.org/ceu/wp-content/uploads/sites/17/2016/12/default_background_4.jpg</guid>\n" +
+"		<description></description>\n" +
+"		<content:encoded><![CDATA[]]></content:encoded>\n" +
+"		<excerpt:encoded><![CDATA[]]></excerpt:encoded>\n" +
+"		<wp:post_id>" + "4" + "</wp:post_id>\n" +
+"		<wp:post_date><![CDATA[2016-11-01 12:11:26]]></wp:post_date>\n" +
+"		<wp:post_date_gmt><![CDATA[2016-11-01 12:11:26]]></wp:post_date_gmt>\n" +
+"		<wp:comment_status><![CDATA[closed]]></wp:comment_status>\n" +
+"		<wp:ping_status><![CDATA[closed]]></wp:ping_status>\n" +
+"		<wp:post_name><![CDATA[" + "default_background_4" + "]]></wp:post_name>\n" +
+"		<wp:status><![CDATA[inherit]]></wp:status>\n" +
+"		<wp:post_parent>0</wp:post_parent>\n" +
+"		<wp:menu_order>0</wp:menu_order>\n" +
+"		<wp:post_type><![CDATA[attachment]]></wp:post_type>\n" +
+"		<wp:post_password><![CDATA[]]></wp:post_password>\n" +
+"		<wp:is_sticky>0</wp:is_sticky>\n" +
+"		<wp:attachment_url><![CDATA[" + "http://www.unhcr.org/ceu/wp-content/uploads/sites/17/2016/12/default_background_4.jpg]]></wp:attachment_url>\n" +
+"		<wp:postmeta>\n" +
+"			<wp:meta_key><![CDATA[_wp_attached_file]]></wp:meta_key>\n" +
+"			<wp:meta_value><![CDATA[2016/12/" + "default_background_4.jpg" + "]]></wp:meta_value>\n" +
+"		</wp:postmeta>\n" +
+"		<wp:postmeta>\n" +
+"			<wp:meta_key><![CDATA[_wp_attachment_metadata]]></wp:meta_key>\n" +
+"			<wp:meta_value></wp:meta_value>\n" +
+"		</wp:postmeta>\n" +
+"</item>\n";
+ return str;
+}
+
 String addBackgroundImageXML (String name, String filename, String url, String title) {
     String str = "<item>\n" +
 "		<title>" + title + "</title>\n" +
