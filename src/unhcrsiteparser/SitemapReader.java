@@ -21,7 +21,7 @@ public class SitemapReader {
 
     private Document doc;
     private NodeList urls;
-    private int k;
+    private int k, depth;
     
     /**
      * This is a public factory method that returns an instance of the SitemapReader
@@ -70,7 +70,9 @@ public class SitemapReader {
      */
     int getXMLLength()
     {
-        return urls.getLength();
+       
+        return depth;
+        //return urls.getLength();
     }
     /**
      * API ends here, from here on methods are for internal use only
@@ -102,6 +104,7 @@ public class SitemapReader {
     private void getURLList() {
         
         urls  = doc.getElementsByTagName("url");
+        depth = urls.getLength();
         
     }
     

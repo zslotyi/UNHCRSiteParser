@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -25,6 +26,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import javafx.stage.WindowEvent;
 
 
 
@@ -34,7 +36,7 @@ public class UserInterface {
     private Button btn;
     private StringProperty feedBackText;
     Task <Void> task ;
-    Label countryCodeLabel, feedURLLabel, writeFileLabel;
+    Label countryCodeLabel, feedURLLabel, writeFileLabel, progressLabel;
     TextField countryCode, feedURL, writeFilePath;
     Label newsURLLabel;
     TextField newsURL;
@@ -64,6 +66,7 @@ public class UserInterface {
 
         return null;
       }
+      
          
             
     };
@@ -73,6 +76,8 @@ public class UserInterface {
       feedBack.textProperty().unbind();
       
     });
+         
+         
          
           Thread thread = new Thread(task);
             thread.setDaemon(true);
@@ -84,6 +89,9 @@ public class UserInterface {
      */
     void setError(String str){
         error.setText(str);
+    }
+    void setProgress(String str){
+        progressLabel.setText(str);
     }
     String getCountryCode(){
         return countryCode.getText();
@@ -125,7 +133,7 @@ public class UserInterface {
        newsURL = new TextField ("news");
        writeFileLabel = new Label ("Where to write the xml?");
        writeFilePath = new TextField ("C:/Users/ballaz/Documents/Website/");
-       
+       progressLabel = new Label();
             //Adding image logo
             Image image = new Image(getClass().getResourceAsStream("unhcr-logo.png"));
             Label label1 = new Label();
@@ -147,6 +155,7 @@ public class UserInterface {
        
        root.add(feedBack,0,7,2,1);
        root.add(error,0,8,2,1);
+       root.add(progressLabel,0,9,2,1);
        
         Scene scene = new Scene(root, 700, 600);
         importCSS(scene);
@@ -154,6 +163,13 @@ public class UserInterface {
         primaryStage.setTitle("UNHCR Website Parser");
         primaryStage.setScene(scene);
         primaryStage.show();
+        primaryStage.setOnCloseRequest((WindowEvent e) -> {
+             try {
+                 Platform.exit();
+             } catch (Exception e1) {
+                 e1.printStackTrace();
+             }
+        });
        
     }
     private void importCSS(Scene scene){

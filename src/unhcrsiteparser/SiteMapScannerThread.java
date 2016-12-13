@@ -34,20 +34,30 @@ public class SiteMapScannerThread implements Runnable{
         unhcrsp = UNHCRSiteParser.getUNHCRSiteParserInstance();
         error = ErrorHandler.getInstance(ui);
         
+        ReadSiteMap();
+        
         Platform.runLater(() -> {
-                        error.setError("Example error mesage");
+                        error.setError("Found " + siteMap.getXMLLength() + " urls in sitemap");
                         });
         
         Platform.runLater(() -> {
                         ui.setFeedBack("Work in progress...");
                         });
-        ReadSiteMap();
-        int k=0;
+        
         unhcrsp.beginTheWholeThing();
+        int k=0;
         while ((SiteURL = siteMap.getNextURL())!= null)
         {
+            k++;
+            double c = k;
+            double process = c/((double)siteMap.getXMLLength()/100);
+        
             Platform.runLater(() -> {
                         ui.setFeedBack(SiteURL);
+            });
+            Platform.runLater(() -> {
+                        
+                        ui.setProgress("We are done with " + (int)process + " %");
             });
                         unhcrsp.parseASite(SiteURL);
                         unhcrsp.WriteASite(SiteURL);
@@ -57,6 +67,7 @@ public class SiteMapScannerThread implements Runnable{
             Platform.runLater(() -> {
                 ui.setFeedBack("Site done!");
             });
+            
         
     }
     private void ReadSiteMap (){
